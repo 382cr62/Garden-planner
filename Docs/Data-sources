@@ -1,0 +1,36 @@
+garden-planner/
+├── README.md                 # Project overview and setup instructions
+├── .gitignore               # Files to ignore (node_modules, etc.)
+├── LICENSE                  # MIT or your chosen license
+│
+├── docs/                    # Documentation folder
+│   ├── user-flow.md        # User flow diagrams and descriptions
+│   ├── data-sources.md     # Links to Johnny's Seeds, Extension data, etc.
+│   ├── biodynamic-principles.md  # Maria Thun calendar research
+│   └── meeting-notes/      # Notes from discussions with your friend
+│
+├── research/               # Research and planning materials
+│   ├── conversations/      # Save this Claude conversation here!
+│   ├── crop-data/         # CSV files or JSON with crop information
+│   │   ├── tomatoes.json
+│   │   ├── peppers.json
+│   │   └── ...
+│   ├── frost-dates/       # Frost date data by region
+│   └── companion-planting/ # Companion planting research
+│
+├── design/                 # Design files and mockups
+│   ├── wireframes/        # UI sketches and wireframes
+│   ├── user-flows/        # Visual flowcharts
+│   └── assets/            # Images, icons, etc.
+│
+├── src/                    # Source code (once you start coding)
+│   ├── components/        # React components
+│   ├── data/             # Static data files
+│   ├── calculations/     # Calculation engines
+│   │   └── tomato-calculator.js  # Your prototype code!
+│   ├── utils/            # Utility functions
+│   └── App.js            # Main application file
+│
+└── public/                # Public assets
+    └── index.html
+Add Data Sources documentation
