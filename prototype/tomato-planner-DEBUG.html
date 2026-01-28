@@ -1,0 +1,709 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Garden Planner - Tomato Calculator (DEBUG)</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            overflow: hidden;
+        }
+
+        header {
+            background: linear-gradient(135deg, #2d5016 0%, #4a7c2c 100%);
+            color: white;
+            padding: 30px;
+            text-align: center;
+        }
+
+        header h1 {
+            font-size: 2.5em;
+            margin-bottom: 10px;
+        }
+
+        header p {
+            font-size: 1.1em;
+            opacity: 0.9;
+        }
+
+        .debug-panel {
+            background: #fff3cd;
+            border: 2px solid #ffc107;
+            padding: 15px;
+            margin: 20px;
+            border-radius: 8px;
+        }
+
+        .debug-panel h3 {
+            color: #856404;
+            margin-bottom: 10px;
+        }
+
+        .debug-status {
+            background: #d4edda;
+            color: #155724;
+            padding: 10px;
+            margin: 5px 0;
+            border-radius: 4px;
+            font-family: monospace;
+        }
+
+        .form-section {
+            padding: 40px;
+        }
+
+        .form-group {
+            margin-bottom: 25px;
+        }
+
+        label {
+            display: block;
+            font-weight: 600;
+            margin-bottom: 8px;
+            color: #333;
+            font-size: 1.05em;
+        }
+
+        input, select {
+            width: 100%;
+            padding: 12px 15px;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            font-size: 1em;
+            transition: border-color 0.3s;
+        }
+
+        input:focus, select:focus {
+            outline: none;
+            border-color: #4a7c2c;
+        }
+
+        .checkbox-group {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .checkbox-group input[type="checkbox"] {
+            width: auto;
+        }
+
+        button {
+            width: 100%;
+            padding: 15px;
+            background: linear-gradient(135deg, #4a7c2c 0%, #2d5016 100%);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 1.2em;
+            font-weight: 600;
+            cursor: pointer;
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+
+        button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(74, 124, 44, 0.4);
+        }
+
+        button:active {
+            transform: translateY(0);
+        }
+
+        .results {
+            display: none;
+            padding: 40px;
+            background: #f8f9fa;
+            border-top: 3px solid #4a7c2c;
+        }
+
+        .results.show {
+            display: block;
+        }
+
+        .results h2 {
+            color: #2d5016;
+            margin-bottom: 20px;
+            font-size: 2em;
+        }
+
+        .timeline-section, .details-section, .succession-section, .care-section {
+            background: white;
+            padding: 25px;
+            border-radius: 12px;
+            margin-bottom: 20px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        .timeline-section h3, .details-section h3, .succession-section h3, .care-section h3 {
+            color: #4a7c2c;
+            margin-bottom: 15px;
+            font-size: 1.5em;
+            border-bottom: 2px solid #e0e0e0;
+            padding-bottom: 10px;
+        }
+
+        .timeline-item {
+            display: flex;
+            justify-content: space-between;
+            padding: 12px 0;
+            border-bottom: 1px solid #f0f0f0;
+        }
+
+        .timeline-item:last-child {
+            border-bottom: none;
+        }
+
+        .timeline-label {
+            font-weight: 600;
+            color: #555;
+        }
+
+        .timeline-date {
+            color: #2d5016;
+            font-weight: 600;
+        }
+
+        .detail-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+        }
+
+        .detail-item {
+            padding: 15px;
+            background: #f8f9fa;
+            border-radius: 8px;
+        }
+
+        .detail-label {
+            font-size: 0.9em;
+            color: #666;
+            margin-bottom: 5px;
+        }
+
+        .detail-value {
+            font-size: 1.3em;
+            font-weight: 700;
+            color: #2d5016;
+        }
+
+        .warning {
+            background: #fff3cd;
+            border-left: 4px solid #ffc107;
+            padding: 15px;
+            margin-bottom: 20px;
+            border-radius: 4px;
+        }
+
+        .warning strong {
+            color: #856404;
+        }
+
+        .companion-plants {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+            margin-top: 10px;
+        }
+
+        .companion-tag {
+            background: #e8f5e9;
+            color: #2d5016;
+            padding: 8px 15px;
+            border-radius: 20px;
+            font-weight: 600;
+        }
+
+        .succession-item {
+            background: #f8f9fa;
+            padding: 15px;
+            margin-bottom: 10px;
+            border-radius: 8px;
+            border-left: 4px solid #4a7c2c;
+        }
+
+        .care-timeline {
+            position: relative;
+            padding-left: 30px;
+        }
+
+        .care-item {
+            margin-bottom: 20px;
+            position: relative;
+        }
+
+        .care-item::before {
+            content: '';
+            position: absolute;
+            left: -23px;
+            top: 5px;
+            width: 12px;
+            height: 12px;
+            background: #4a7c2c;
+            border-radius: 50%;
+            border: 3px solid white;
+            box-shadow: 0 0 0 2px #4a7c2c;
+        }
+
+        .care-week {
+            font-weight: 600;
+            color: #4a7c2c;
+            font-size: 0.9em;
+        }
+
+        .care-task {
+            font-size: 1.1em;
+            color: #333;
+            margin: 5px 0;
+        }
+
+        .care-date {
+            font-size: 0.9em;
+            color: #666;
+        }
+
+        .biodynamic-note {
+            background: #e3f2fd;
+            border-left: 4px solid #2196f3;
+            padding: 15px;
+            margin-top: 15px;
+            border-radius: 4px;
+        }
+
+        @media (max-width: 600px) {
+            header h1 {
+                font-size: 2em;
+            }
+
+            .form-section, .results {
+                padding: 20px;
+            }
+
+            .detail-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>🌱 Garden Planner</h1>
+            <p>Plan your tomato garden with precision (DEBUG MODE)</p>
+        </header>
+
+        <div class="debug-panel">
+            <h3>🔍 Debug Information</h3>
+            <div id="debugInfo">
+                <div class="debug-status">✅ Page loaded successfully</div>
+                <div class="debug-status">✅ JavaScript is running</div>
+            </div>
+        </div>
+
+        <div class="form-section">
+            <form id="plannerForm">
+                <div class="form-group">
+                    <label for="tomatoType">Tomato Type</label>
+                    <select id="tomatoType" required>
+                        <option value="">Select tomato type...</option>
+                        <option value="cherry">Cherry (e.g., Sungold, Sweet Million)</option>
+                        <option value="grape">Grape (e.g., Juliet, Santa)</option>
+                        <option value="slicing">Slicing (e.g., Big Beef, Better Boy)</option>
+                        <option value="beefsteak">Beefsteak (e.g., Brandywine, Cherokee Purple)</option>
+                        <option value="paste">Paste (e.g., San Marzano, Roma)</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label for="harvestDate">Target Harvest Date</label>
+                    <input type="date" id="harvestDate" required>
+                </div>
+
+                <div class="form-group">
+                    <label for="zipCode">Zip Code (for frost dates)</label>
+                    <input type="text" id="zipCode" placeholder="e.g., 37311" pattern="[0-9]{5}" required>
+                </div>
+
+                <div class="form-group">
+                    <label for="desiredYield">Desired Yield (pounds)</label>
+                    <input type="number" id="desiredYield" min="1" placeholder="e.g., 30" required>
+                </div>
+
+                <div class="form-group checkbox-group">
+                    <input type="checkbox" id="useBiodynamic">
+                    <label for="useBiodynamic" style="margin-bottom: 0;">Use Biodynamic Planting Calendar (Maria Thun principles)</label>
+                </div>
+
+                <button type="submit">Calculate My Planting Schedule</button>
+            </form>
+        </div>
+
+        <div class="results" id="results">
+            <!-- Results will be inserted here -->
+        </div>
+    </div>
+
+    <script>
+        // Add debug logging
+        function addDebugMessage(message, isError = false) {
+            const debugDiv = document.getElementById('debugInfo');
+            const statusDiv = document.createElement('div');
+            statusDiv.className = 'debug-status';
+            statusDiv.style.background = isError ? '#f8d7da' : '#d4edda';
+            statusDiv.style.color = isError ? '#721c24' : '#155724';
+            statusDiv.textContent = (isError ? '❌ ' : '✅ ') + message;
+            debugDiv.appendChild(statusDiv);
+        }
+
+        addDebugMessage('Starting initialization...');
+
+        // Tomato variety data
+        const tomatoVarieties = {
+            cherry: {
+                avgDTM: 65,
+                dtmRange: '55-79',
+                transplantWeeks: 6,
+                yieldPerPlant: { fruits: 120, pounds: 8 },
+                spacing: 24,
+                companion: ['Basil', 'Marigold', 'Carrots'],
+                growthHabit: 'indeterminate',
+                examples: ['Sungold', 'Sweet Million', 'Black Cherry']
+            },
+            grape: {
+                avgDTM: 72,
+                dtmRange: '70-74',
+                transplantWeeks: 6,
+                yieldPerPlant: { fruits: 100, pounds: 7 },
+                spacing: 24,
+                companion: ['Basil', 'Marigold', 'Carrots'],
+                growthHabit: 'indeterminate',
+                examples: ['Juliet', 'Santa']
+            },
+            slicing: {
+                avgDTM: 75,
+                dtmRange: '65-89',
+                transplantWeeks: 6,
+                yieldPerPlant: { fruits: 25, pounds: 15 },
+                spacing: 30,
+                companion: ['Basil', 'Marigold', 'Carrots'],
+                growthHabit: 'indeterminate',
+                examples: ['Big Beef', 'Better Boy']
+            },
+            beefsteak: {
+                avgDTM: 78,
+                dtmRange: '70-85',
+                transplantWeeks: 6,
+                yieldPerPlant: { fruits: 20, pounds: 12 },
+                spacing: 36,
+                companion: ['Basil', 'Marigold', 'Carrots'],
+                growthHabit: 'indeterminate',
+                examples: ['Brandywine', 'Cherokee Purple']
+            },
+            paste: {
+                avgDTM: 80,
+                dtmRange: '75-85',
+                transplantWeeks: 6,
+                yieldPerPlant: { fruits: 30, pounds: 10 },
+                spacing: 24,
+                companion: ['Basil', 'Marigold', 'Carrots'],
+                growthHabit: 'determinate',
+                examples: ['San Marzano', 'Roma']
+            }
+        };
+
+        addDebugMessage('Tomato data loaded');
+
+        // Frost date database
+        const frostDates = {
+            '37311': { lastSpring: '2026-04-15', firstFall: '2026-10-20', zone: '7a' },
+            '25301': { lastSpring: '2026-04-25', firstFall: '2026-10-15', zone: '6b' },
+            '10001': { lastSpring: '2026-04-15', firstFall: '2026-11-10', zone: '7b' },
+            '90001': { lastSpring: '2026-02-15', firstFall: '2026-12-15', zone: '10a' },
+            '60601': { lastSpring: '2026-05-10', firstFall: '2026-10-10', zone: '6a' }
+        };
+
+        addDebugMessage('Frost date database loaded');
+
+        function addDays(date, days) {
+            const result = new Date(date);
+            result.setDate(result.getDate() + days);
+            return result;
+        }
+
+        function subtractDays(date, days) {
+            const result = new Date(date);
+            result.setDate(result.getDate() - days);
+            return result;
+        }
+
+        function formatDate(date) {
+            return date.toLocaleDateString('en-US', { 
+                weekday: 'long',
+                year: 'numeric', 
+                month: 'long', 
+                day: 'numeric' 
+            });
+        }
+
+        function formatShortDate(date) {
+            return date.toLocaleDateString('en-US', { 
+                month: 'short', 
+                day: 'numeric',
+                year: 'numeric'
+            });
+        }
+
+        addDebugMessage('Helper functions defined');
+
+        function calculatePlantingSchedule(params) {
+            addDebugMessage('Starting calculation...');
+            const { tomatoType, targetHarvestDate, zipCode, desiredYield, useBiodynamic } = params;
+            const variety = tomatoVarieties[tomatoType];
+            const harvestDate = new Date(targetHarvestDate);
+            const frostData = frostDates[zipCode] || frostDates['37311'];
+            const lastFrostDate = new Date(frostData.lastSpring);
+
+            const transplantDate = subtractDays(harvestDate, variety.avgDTM);
+            const seedStartDate = subtractDays(transplantDate, variety.transplantWeeks * 7);
+            const hardenOffStart = subtractDays(transplantDate, 7);
+
+            const isSafePlanting = transplantDate >= lastFrostDate;
+            const plantsNeeded = Math.ceil(desiredYield / variety.yieldPerPlant.pounds);
+            const successionInterval = 14;
+            const maxSuccessions = 3;
+
+            const schedule = {
+                tomatoType,
+                variety: variety.examples[0],
+                timeline: {
+                    seedStart: formatDate(seedStartDate),
+                    seedStartDate: seedStartDate,
+                    hardenOff: formatDate(hardenOffStart),
+                    transplant: formatDate(transplantDate),
+                    transplantDate: transplantDate,
+                    firstHarvest: formatDate(harvestDate),
+                    harvestWindow: {
+                        start: formatDate(harvestDate),
+                        end: formatDate(addDays(harvestDate, 30))
+                    }
+                },
+                planting: {
+                    plantsNeeded,
+                    spacing: `${variety.spacing} inches`,
+                    spaceSqFt: Math.ceil((variety.spacing / 12) * (variety.spacing / 12) * plantsNeeded),
+                    growthHabit: variety.growthHabit
+                },
+                expectedYield: {
+                    perPlant: {
+                        pounds: variety.yieldPerPlant.pounds,
+                        fruits: variety.yieldPerPlant.fruits
+                    },
+                    total: {
+                        pounds: plantsNeeded * variety.yieldPerPlant.pounds,
+                        fruits: plantsNeeded * variety.yieldPerPlant.fruits
+                    }
+                },
+                companion: {
+                    goodCompanions: variety.companion,
+                    plantingTips: 'Plant basil between tomato plants to deter pests and improve flavor.'
+                },
+                warnings: !isSafePlanting ? [
+                    `Warning: Transplant date (${formatShortDate(transplantDate)}) is before last frost (${formatShortDate(lastFrostDate)}). Consider protection or delay planting.`
+                ] : [],
+                frostInfo: frostData,
+                succession: Array.from({ length: maxSuccessions }, (_, i) => ({
+                    number: i + 1,
+                    seedStart: formatShortDate(addDays(seedStartDate, successionInterval * i)),
+                    transplant: formatShortDate(addDays(transplantDate, successionInterval * i)),
+                    harvest: formatShortDate(addDays(harvestDate, successionInterval * i))
+                })),
+                careTasks: [
+                    { week: 0, task: 'Start seeds indoors', date: formatShortDate(seedStartDate) },
+                    { week: 5, task: 'Begin hardening off', date: formatShortDate(hardenOffStart) },
+                    { week: 6, task: 'Transplant to garden', date: formatShortDate(transplantDate) },
+                    { week: 8, task: 'Begin fertilizing weekly', date: formatShortDate(addDays(transplantDate, 14)) },
+                    { week: 10, task: 'Prune suckers, add stakes/cages', date: formatShortDate(addDays(transplantDate, 28)) },
+                    { week: 12, task: 'Watch for first fruits', date: formatShortDate(addDays(transplantDate, 42)) }
+                ],
+                useBiodynamic
+            };
+
+            addDebugMessage('Calculation complete!');
+            return schedule;
+        }
+
+        function displayResults(schedule) {
+            addDebugMessage('Displaying results...');
+            const resultsDiv = document.getElementById('results');
+            
+            let html = '<h2>Your Tomato Planting Schedule</h2>';
+
+            if (schedule.warnings.length > 0) {
+                html += '<div class="warning">';
+                schedule.warnings.forEach(warning => {
+                    html += `<p><strong>⚠️ ${warning}</strong></p>`;
+                });
+                html += '</div>';
+            }
+
+            html += '<div class="timeline-section">';
+            html += '<h3>📅 Key Dates</h3>';
+            html += `<div class="timeline-item">
+                        <span class="timeline-label">🌱 Start Seeds Indoors</span>
+                        <span class="timeline-date">${schedule.timeline.seedStart}</span>
+                    </div>`;
+            html += `<div class="timeline-item">
+                        <span class="timeline-label">🌤️ Begin Hardening Off</span>
+                        <span class="timeline-date">${schedule.timeline.hardenOff}</span>
+                    </div>`;
+            html += `<div class="timeline-item">
+                        <span class="timeline-label">🌿 Transplant to Garden</span>
+                        <span class="timeline-date">${schedule.timeline.transplant}</span>
+                    </div>`;
+            html += `<div class="timeline-item">
+                        <span class="timeline-label">🍅 First Harvest</span>
+                        <span class="timeline-date">${schedule.timeline.firstHarvest}</span>
+                    </div>`;
+            html += `<div class="timeline-item">
+                        <span class="timeline-label">📦 Harvest Window</span>
+                        <span class="timeline-date">${schedule.timeline.harvestWindow.start} - ${schedule.timeline.harvestWindow.end}</span>
+                    </div>`;
+            html += '</div>';
+
+            html += '<div class="details-section">';
+            html += '<h3>📊 Garden Details</h3>';
+            html += '<div class="detail-grid">';
+            html += `<div class="detail-item">
+                        <div class="detail-label">Tomato Type</div>
+                        <div class="detail-value">${schedule.variety}</div>
+                    </div>`;
+            html += `<div class="detail-item">
+                        <div class="detail-label">Plants Needed</div>
+                        <div class="detail-value">${schedule.planting.plantsNeeded}</div>
+                    </div>`;
+            html += `<div class="detail-item">
+                        <div class="detail-label">Plant Spacing</div>
+                        <div class="detail-value">${schedule.planting.spacing}</div>
+                    </div>`;
+            html += `<div class="detail-item">
+                        <div class="detail-label">Space Required</div>
+                        <div class="detail-value">${schedule.planting.spaceSqFt} sq ft</div>
+                    </div>`;
+            html += `<div class="detail-item">
+                        <div class="detail-label">Expected Yield</div>
+                        <div class="detail-value">${schedule.expectedYield.total.pounds} lbs</div>
+                    </div>`;
+            html += `<div class="detail-item">
+                        <div class="detail-label">Growth Habit</div>
+                        <div class="detail-value">${schedule.planting.growthHabit}</div>
+                    </div>`;
+            html += `<div class="detail-item">
+                        <div class="detail-label">Your Zone</div>
+                        <div class="detail-value">${schedule.frostInfo.zone}</div>
+                    </div>`;
+            html += '</div>';
+            
+            html += '<h4 style="margin-top: 20px; color: #4a7c2c;">🌸 Companion Plants</h4>';
+            html += '<div class="companion-plants">';
+            schedule.companion.goodCompanions.forEach(plant => {
+                html += `<span class="companion-tag">${plant}</span>`;
+            });
+            html += '</div>';
+            html += `<p style="margin-top: 10px; color: #666;"><em>${schedule.companion.plantingTips}</em></p>`;
+            html += '</div>';
+
+            html += '<div class="care-section">';
+            html += '<h3>✅ Care Timeline</h3>';
+            html += '<div class="care-timeline">';
+            schedule.careTasks.forEach(task => {
+                html += `<div class="care-item">
+                            <div class="care-week">Week ${task.week}</div>
+                            <div class="care-task">${task.task}</div>
+                            <div class="care-date">${task.date}</div>
+                        </div>`;
+            });
+            html += '</div>';
+            html += '</div>';
+
+            html += '<div class="succession-section">';
+            html += '<h3>🔄 Succession Planting Schedule</h3>';
+            html += '<p style="color: #666; margin-bottom: 15px;">Plant multiple batches for continuous harvest throughout the season:</p>';
+            schedule.succession.forEach(planting => {
+                html += `<div class="succession-item">
+                            <strong>Planting ${planting.number}:</strong> 
+                            Seed ${planting.seedStart} → Transplant ${planting.transplant} → Harvest ${planting.harvest}
+                        </div>`;
+            });
+            html += '</div>';
+
+            if (schedule.useBiodynamic) {
+                html += '<div class="biodynamic-note">';
+                html += '<h4 style="color: #1976d2; margin-bottom: 10px;">🌙 Biodynamic Calendar Notes</h4>';
+                html += '<p><strong>Optimal seeding:</strong> Fruit days when moon is in fire signs (Aries, Leo, Sagittarius)</p>';
+                html += '<p><strong>Optimal transplanting:</strong> During descending moon period</p>';
+                html += '<p><em>Full biodynamic calendar integration coming soon!</em></p>';
+                html += '</div>';
+            }
+
+            resultsDiv.innerHTML = html;
+            resultsDiv.classList.add('show');
+            resultsDiv.scrollIntoView({ behavior: 'smooth' });
+            addDebugMessage('Results displayed successfully!');
+        }
+
+        addDebugMessage('Attaching form event listener...');
+
+        document.getElementById('plannerForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            addDebugMessage('Form submitted!');
+            
+            try {
+                const formData = {
+                    tomatoType: document.getElementById('tomatoType').value,
+                    targetHarvestDate: document.getElementById('harvestDate').value,
+                    zipCode: document.getElementById('zipCode').value,
+                    desiredYield: parseInt(document.getElementById('desiredYield').value),
+                    useBiodynamic: document.getElementById('useBiodynamic').checked
+                };
+
+                addDebugMessage(`Form data: ${JSON.stringify(formData)}`);
+
+                const schedule = calculatePlantingSchedule(formData);
+                displayResults(schedule);
+            } catch (error) {
+                addDebugMessage(`Error: ${error.message}`, true);
+                console.error('Full error:', error);
+            }
+        });
+
+        addDebugMessage('Form listener attached successfully!');
+
+        // Set default date to 3 months from now
+        const defaultDate = new Date();
+        defaultDate.setMonth(defaultDate.getMonth() + 3);
+        document.getElementById('harvestDate').valueAsDate = defaultDate;
+
+        addDebugMessage('Default date set');
+        addDebugMessage('🎉 All systems ready! Try the calculator.');
+    </script>
+</body>
+</html>
